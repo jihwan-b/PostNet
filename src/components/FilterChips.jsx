@@ -2,6 +2,7 @@ import React from 'react';
 
 const CATEGORIES = [
     { id: 'job', label: '취업', emoji: '💼' },
+    { id: 'scholarship', label: '장학', emoji: '🎓' },
     { id: 'event', label: '학교 행사', emoji: '🎉' },
     { id: 'club', label: '동아리&학회', emoji: '👥' },
     { id: 'education', label: '교육&강연', emoji: '📚' },

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const CATEGORIES = [
     { id: 'job', label: '취업', emoji: '💼', description: '채용, 인턴십, 취업설명회' },
+    { id: 'scholarship', label: '장학', emoji: '🎓', description: '장학금, 교환학생, 학비지원' },
     { id: 'event', label: '학교 행사', emoji: '🎉', description: '축제, 체육대회, 특강' },
     { id: 'club', label: '동아리&학회', emoji: '👥', description: '동아리 모집, 학회 세미나' },
     { id: 'education', label: '교육&강연', emoji: '📚', description: '특강, 워크샵, 자격증' },
@@ -101,8 +102,8 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                                         key={category.id}
                                         onClick={() => handleCategoryToggle(category.id)}
                                         className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left ${isSelected
-                                                ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
-                                                : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                                            ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                                            : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
                                             }`}
                                     >
                                         <span className="text-3xl mb-2 block">{category.emoji}</span>
@@ -180,10 +181,10 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                         <div
                             key={s}
                             className={`w-2 h-2 rounded-full transition-all duration-300 ${s === step
-                                    ? 'w-8 bg-gradient-to-r from-purple-500 to-pink-500'
-                                    : s < step
-                                        ? 'bg-purple-500'
-                                        : 'bg-white/20'
+                                ? 'w-8 bg-gradient-to-r from-purple-500 to-pink-500'
+                                : s < step
+                                    ? 'bg-purple-500'
+                                    : 'bg-white/20'
                                 }`}
                         />
                     ))}

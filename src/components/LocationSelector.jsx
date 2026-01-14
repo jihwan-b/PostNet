@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
 const LOCATIONS = [
-    { id: 'engineering', name: '공학관', icon: '🏗️' },
-    { id: 'humanities', name: '인문관', icon: '📖' },
-    { id: 'library', name: '중앙도서관', icon: '📚' },
-    { id: 'student', name: '학생회관', icon: '🏢' },
-    { id: 'science', name: '자연과학관', icon: '🔬' },
-    { id: 'art', name: '예술관', icon: '🎨' },
+    { id: 'engineering', name: '공학원(제1공학관)', icon: '🏗️' },
+    { id: 'samsung', name: '삼성학술정보관', icon: '📚' },
+    { id: 'baekyang', name: '백양누리', icon: '🏢' },
+    { id: 'student', name: '학생회관', icon: '🎭' },
+    { id: 'science', name: '과학관', icon: '🔬' },
+    { id: 'yongjae', name: '용재홀', icon: '🎓' },
 ];
 
 const LocationSelector = ({ selectedLocations = [], onLocationToggle, onLogEvent }) => {
@@ -70,8 +70,8 @@ const LocationSelector = ({ selectedLocations = [], onLocationToggle, onLogEvent
                                         key={location.id}
                                         onClick={() => handleToggle(location)}
                                         className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${isSelected
-                                                ? 'bg-purple-500/20 text-purple-300'
-                                                : 'text-white hover:bg-white/10'
+                                            ? 'bg-purple-500/20 text-purple-300'
+                                            : 'text-white hover:bg-white/10'
                                             }`}
                                     >
                                         <span className="text-xl">{location.icon}</span>
