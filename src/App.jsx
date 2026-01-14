@@ -622,8 +622,21 @@ function App() {
             category: notification.category,
         });
 
-        // 해당 카테고리의 첫 번째 포스터 찾기 (알림과 포스터 ID가 다르므로)
-        const matchingPoster = SAMPLE_POSTERS.find(p => p.category === notification.category);
+        // 1. 제목이 정확히 일치하는 포스터 찾기
+        let matchingPoster = SAMPLE_POSTERS.find(p => p.title === notification.title);
+
+        // 2. 제목이 부분 일치하는 포스터 찾기 (알림 제목이 포스터 제목을 포함하거나 반대)
+        if (!matchingPoster) {
+            matchingPoster = SAMPLE_POSTERS.find(p =>
+                p.title.includes(notification.title) ||
+                notification.title.includes(p.title)
+            );
+        }
+
+        // 3. 같은 카테고리의 첫 번째 포스터 (fallback)
+        if (!matchingPoster) {
+            matchingPoster = SAMPLE_POSTERS.find(p => p.category === notification.category);
+        }
 
         // DOM 업데이트 후 해당 포스터로 스크롤
         setTimeout(() => {
@@ -839,8 +852,15 @@ function App() {
             />
 
             {/* Footer */}
-            <footer className="py-6 text-center text-gray-500 text-sm">
-                Made with <span className="text-red-500">❤️</span> by Jihwan & Sora
+            <footer className="py-6 text-center">
+                <a
+                    href="https://github.com/jihwan-b/PostNet"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-1 py-0.5 text-gray-500 text-sm transition-all duration-300 hover:bg-black hover:text-white"
+                >
+                    Made with <span className="text-red-500">❤️</span> by Jihwan & Sora
+                </a>
             </footer>
         </div>
     );

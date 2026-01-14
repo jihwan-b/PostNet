@@ -48,7 +48,7 @@ const Header = ({ onArchiveClick, savedCount = 0, onSettingsReset }) => {
                     </span>
                 </h1>
                 <p className="text-lg md:text-xl text-gray-300 font-light tracking-wide">
-                    나에게 딱 맞는 교내 정보
+                    나에게 딱 맞는 연세대학교 교내 정보
                 </p>
                 <div className="mt-6 flex justify-center gap-2">
                     <div className="w-8 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>

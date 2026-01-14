@@ -35,7 +35,7 @@ const VisitorCounter = () => {
                     )}
                 </span>
             </div>
-            <p className="mt-3 text-sm text-gray-500">© 2026 PostNet. All rights reserved.</p>
+            <p className="mt-3 text-sm text-gray-500">© 2026 Yonsei Univ. Workstation PostNet Team. All rights reserved.</p>
         </footer>
     );
 };
