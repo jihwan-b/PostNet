@@ -1,7 +1,7 @@
 import React from 'react';
 import PosterCard from './PosterCard';
 
-const PosterGrid = ({ posters }) => {
+const PosterGrid = ({ posters, onSavePoster, savedPosterIds = [] }) => {
     if (posters.length === 0) {
         return (
             <div className="text-center py-20">
@@ -16,7 +16,12 @@ const PosterGrid = ({ posters }) => {
         <div className="px-6 pb-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {posters.map((poster) => (
-                    <PosterCard key={poster.id} poster={poster} />
+                    <PosterCard
+                        key={poster.id}
+                        poster={poster}
+                        onSave={onSavePoster}
+                        isSaved={savedPosterIds.includes(poster.id)}
+                    />
                 ))}
             </div>
         </div>

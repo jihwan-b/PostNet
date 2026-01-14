@@ -8,6 +8,7 @@ import VisitorCounter from './components/VisitorCounter';
 import OnboardingModal from './components/OnboardingModal';
 import LocationSelector, { LOCATIONS } from './components/LocationSelector';
 import NotificationPopup from './components/NotificationPopup';
+import ArchiveModal from './components/ArchiveModal';
 import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount } from './firebase';
 
 // 위치별 샘플 공고 데이터
@@ -162,10 +163,14 @@ function App() {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [userCategories, setUserCategories] = useState([]);
 
-    // 위치 및 알림 상태
-    const [currentLocation, setCurrentLocation] = useState('engineering');
+    // 위치 및 알림 상태 (다중 선택)
+    const [selectedLocations, setSelectedLocations] = useState(['engineering']);
     const [currentNotification, setCurrentNotification] = useState(null);
     const [savedNotifications, setSavedNotifications] = useState([]);
+
+    // 보관함 상태 (포스터)
+    const [savedPosters, setSavedPosters] = useState([]);
+    const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
     // 필터 및 모달 상태
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -202,14 +207,20 @@ function App() {
 
         // 첫 알림 표시 (1초 후)
         setTimeout(() => {
-            showNotificationForLocation(currentLocation, categories);
+            showNotificationForLocations(selectedLocations, categories);
         }, 1000);
     };
 
-    const showNotificationForLocation = (locationId, categories = userCategories) => {
-        const notifications = LOCATION_NOTIFICATIONS[locationId] || [];
+    const showNotificationForLocations = (locationIds, categories = userCategories) => {
+        // 선택된 모든 위치에서 알림 수집
+        let allNotifications = [];
+        locationIds.forEach((locationId) => {
+            const notifications = LOCATION_NOTIFICATIONS[locationId] || [];
+            allNotifications = [...allNotifications, ...notifications];
+        });
+
         // 사용자 관심 카테고리에 맞는 알림 필터링
-        const relevantNotifications = notifications.filter(
+        const relevantNotifications = allNotifications.filter(
             (n) => categories.includes(n.category)
         );
 
@@ -220,31 +231,47 @@ function App() {
             setCurrentNotification(randomNotification);
             logEvent('notification_shown', {
                 notification_id: randomNotification.id,
-                location: locationId,
+                locations: locationIds,
             });
         }
     };
 
-    const handleLocationChange = (location) => {
-        setCurrentLocation(location.id);
+    const handleLocationToggle = (location) => {
+        setSelectedLocations((prev) => {
+            const newLocations = prev.includes(location.id)
+                ? prev.filter((id) => id !== location.id)
+                : [...prev, location.id];
 
-        // 위치 변경 시 새 알림 표시
-        setTimeout(() => {
-            showNotificationForLocation(location.id);
-        }, 500);
+            // 위치 변경 시 새 알림 표시
+            if (newLocations.length > 0 && !prev.includes(location.id)) {
+                setTimeout(() => {
+                    showNotificationForLocations(newLocations);
+                }, 500);
+            }
+
+            return newLocations;
+        });
     };
 
     const handleViewDetail = async (notification) => {
         await incrementReactionCount();
-        alert(`"${notification.title}" 상세 페이지로 이동합니다.`);
+        // 해당 카테고리로 필터 설정 (alert 없이)
+        setSelectedCategories([notification.category]);
         setCurrentNotification(null);
+
+        logEvent('view_detail_navigated', {
+            notification_id: notification.id,
+            category: notification.category,
+        });
     };
 
     const handleSaveNotification = async (notification) => {
         await incrementReactionCount();
-        setSavedNotifications((prev) => [...prev, notification]);
+        // 중복 체크
+        if (!savedNotifications.find((n) => n.id === notification.id)) {
+            setSavedNotifications((prev) => [...prev, notification]);
+        }
         setCurrentNotification(null);
-        alert('보관함에 저장되었습니다!');
     };
 
     const handleDismissNotification = () => {
@@ -261,6 +288,35 @@ function App() {
                 ? prev.filter((c) => c !== categoryId)
                 : [...prev, categoryId]
         );
+    };
+
+    // 포스터 저장 핸들러
+    const handleSavePoster = (poster) => {
+        setSavedPosters((prev) => {
+            const isAlreadySaved = prev.find((p) => p.id === poster.id);
+            if (isAlreadySaved) {
+                // 이미 저장되어 있으면 제거 (토글)
+                return prev.filter((p) => p.id !== poster.id);
+            } else {
+                // 저장
+                logEvent('poster_saved', { poster_id: poster.id, title: poster.title });
+                return [...prev, poster];
+            }
+        });
+    };
+
+    // 보관함에서 아이템 제거
+    const handleRemoveFromArchive = (itemId) => {
+        // 알림에서 제거
+        setSavedNotifications((prev) => prev.filter((n) => n.id !== itemId));
+        // 포스터에서 제거
+        setSavedPosters((prev) => prev.filter((p) => p.id !== itemId));
+    };
+
+    // 보관함 바로가기 (카테고리로 이동)
+    const handleMoveFromArchive = (item) => {
+        setSelectedCategories([item.category]);
+        setIsArchiveOpen(false);
     };
 
     const handleFeedbackSubmit = async (feedbackData) => {
@@ -282,6 +338,15 @@ function App() {
         );
     }, [selectedCategories]);
 
+    // 보관함 내용 통합 (알림 + 포스터)
+    const allSavedItems = useMemo(() => {
+        return [...savedNotifications, ...savedPosters];
+    }, [savedNotifications, savedPosters]);
+
+    const savedPosterIds = useMemo(() => {
+        return savedPosters.map((p) => p.id);
+    }, [savedPosters]);
+
     return (
         <div className="min-h-screen flex flex-col">
             {/* Onboarding Modal */}
@@ -291,13 +356,16 @@ function App() {
             />
 
             {/* Main Content */}
-            <Header />
+            <Header
+                onArchiveClick={() => setIsArchiveOpen(true)}
+                savedCount={allSavedItems.length}
+            />
 
             {/* Location Selector */}
             <div className="px-6 py-4 flex justify-center">
                 <LocationSelector
-                    currentLocation={currentLocation}
-                    onLocationChange={handleLocationChange}
+                    selectedLocations={selectedLocations}
+                    onLocationToggle={handleLocationToggle}
                     onLogEvent={handleLogEvent}
                 />
             </div>
@@ -308,7 +376,11 @@ function App() {
             />
 
             <main className="flex-1">
-                <PosterGrid posters={filteredPosters} />
+                <PosterGrid
+                    posters={filteredPosters}
+                    onSavePoster={handleSavePoster}
+                    savedPosterIds={savedPosterIds}
+                />
             </main>
 
             <VisitorCounter />
@@ -320,6 +392,15 @@ function App() {
                 onSave={handleSaveNotification}
                 onDismiss={handleDismissNotification}
                 onLogEvent={handleLogEvent}
+            />
+
+            {/* Archive Modal */}
+            <ArchiveModal
+                isOpen={isArchiveOpen}
+                onClose={() => setIsArchiveOpen(false)}
+                savedNotifications={allSavedItems}
+                onMove={handleMoveFromArchive}
+                onRemove={handleRemoveFromArchive}
             />
 
             {/* Feedback FAB & Modal */}
@@ -334,3 +415,4 @@ function App() {
 }
 
 export default App;
+

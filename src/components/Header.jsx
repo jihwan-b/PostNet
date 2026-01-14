@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = () => {
+const Header = ({ onArchiveClick, savedCount = 0 }) => {
     return (
         <header className="relative py-12 px-6 text-center">
             {/* Background decorative elements */}
@@ -8,6 +8,22 @@ const Header = () => {
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-600/20 rounded-full blur-3xl"></div>
             </div>
+
+            {/* Archive Button */}
+            <button
+                onClick={onArchiveClick}
+                className="absolute top-6 right-6 z-20 p-3 bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl hover:bg-white/10 hover:border-purple-500/30 transition-all group"
+                title="보관함"
+            >
+                <svg className="w-6 h-6 text-gray-400 group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                {savedCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-xs text-white flex items-center justify-center font-medium">
+                        {savedCount}
+                    </span>
+                )}
+            </button>
 
             {/* Content */}
             <div className="relative z-10">
