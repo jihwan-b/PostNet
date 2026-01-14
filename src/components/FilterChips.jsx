@@ -1,4 +1,5 @@
 import React from 'react';
+import { incrementUserAction } from '../firebase';
 
 const CATEGORIES = [
     { id: 'job', label: '취업', emoji: '💼' },
@@ -9,6 +10,13 @@ const CATEGORIES = [
 ];
 
 const FilterChips = ({ selectedCategories, onCategoryToggle }) => {
+    const handleCategoryClick = (categoryId) => {
+        // Firebase에 카테고리 클릭 추적
+        incrementUserAction('category_click', categoryId);
+        // 기존 토글 핸들러 호출
+        onCategoryToggle(categoryId);
+    };
+
     return (
         <div className="px-6 py-4">
             <div className="flex flex-wrap justify-center gap-3">
@@ -17,7 +25,7 @@ const FilterChips = ({ selectedCategories, onCategoryToggle }) => {
                     return (
                         <button
                             key={category.id}
-                            onClick={() => onCategoryToggle(category.id)}
+                            onClick={() => handleCategoryClick(category.id)}
                             className={`chip ${isActive ? 'chip-active' : ''}`}
                         >
                             <span className="mr-2">{category.emoji}</span>
@@ -37,3 +45,4 @@ const FilterChips = ({ selectedCategories, onCategoryToggle }) => {
 
 export { CATEGORIES };
 export default FilterChips;
+

@@ -155,5 +155,51 @@ export const saveUserCategories = async (categories) => {
     }
 };
 
+// 사용자 행동 추적 함수 (Pre-Launch 검증용)
+// stats/user_actions 문서에 각 행동을 카운팅
+export const incrementUserAction = async (actionType, actionName = null) => {
+    try {
+        const actionsRef = doc(db, 'stats', 'user_actions');
+        const actionsDoc = await getDoc(actionsRef);
+
+        // 필드 이름 결정
+        let fieldName;
+        switch (actionType) {
+            case 'category_click':
+                // 카테고리별로 별도 필드 (예: category_job, category_scholarship)
+                fieldName = `category_${actionName}`;
+                break;
+            case 'poster_detail_view':
+                fieldName = '포스터_상세_조회';
+                break;
+            case 'feedback_modal_open':
+                fieldName = '피드백_창_열림';
+                break;
+            default:
+                fieldName = actionType;
+        }
+
+        if (actionsDoc.exists()) {
+            await updateDoc(actionsRef, {
+                [fieldName]: increment(1),
+                lastUpdated: serverTimestamp()
+            });
+        } else {
+            // 문서가 없으면 생성
+            await setDoc(actionsRef, {
+                [fieldName]: 1,
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp()
+            });
+        }
+
+        console.log(`[UserAction] ${fieldName} incremented`);
+        return { success: true };
+    } catch (error) {
+        console.error('사용자 행동 추적 오류:', error);
+        return { success: false, error };
+    }
+};
+
 export { db };
 

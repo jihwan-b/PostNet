@@ -9,7 +9,7 @@ import OnboardingModal from './components/OnboardingModal';
 import LocationSelector, { LOCATIONS } from './components/LocationSelector';
 import NotificationPopup from './components/NotificationPopup';
 import ArchiveModal from './components/ArchiveModal';
-import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount } from './firebase';
+import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount, incrementUserAction } from './firebase';
 
 // 위치별 샘플 공고 데이터 (연세대 신촌캠퍼스)
 const LOCATION_NOTIFICATIONS = {
@@ -282,7 +282,7 @@ function App() {
         logEvent('session_start', { timestamp: new Date().toISOString() });
     }, []);
 
-    const handleOnboardingComplete = async (categories) => {
+    const handleOnboardingComplete = async (categories, userInfo = {}) => {
         setShowOnboarding(false);
         setUserCategories(categories);
         setSelectedCategories(categories);
@@ -290,9 +290,21 @@ function App() {
         localStorage.setItem('postnet_onboarding_complete', 'true');
         localStorage.setItem('postnet_user_categories', JSON.stringify(categories));
 
+        // 학년과 단과대학 정보도 저장
+        if (userInfo.grade) {
+            localStorage.setItem('postnet_user_grade', userInfo.grade);
+        }
+        if (userInfo.college) {
+            localStorage.setItem('postnet_user_college', userInfo.college);
+        }
+
         // Firebase에 저장
         await saveUserCategories(categories);
-        await logEvent('onboarding_completed', { categories });
+        await logEvent('onboarding_completed', {
+            categories,
+            grade: userInfo.grade,
+            college: userInfo.college
+        });
 
         // 첫 알림 표시 (1초 후)
         setTimeout(() => {
@@ -493,7 +505,10 @@ function App() {
             />
 
             {/* Feedback FAB & Modal */}
-            <FeedbackFAB onClick={() => setIsModalOpen(true)} />
+            <FeedbackFAB onClick={() => {
+                incrementUserAction('feedback_modal_open');
+                setIsModalOpen(true);
+            }} />
             <FeedbackModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

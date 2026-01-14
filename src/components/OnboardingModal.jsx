@@ -1,5 +1,36 @@
 import React, { useState, useEffect } from 'react';
 
+const GRADES = [
+    { id: '1', label: '1학년', emoji: '🌱' },
+    { id: '2', label: '2학년', emoji: '🌿' },
+    { id: '3', label: '3학년', emoji: '🌳' },
+    { id: '4', label: '4학년', emoji: '🎯' },
+    { id: 'leave', label: '휴학', emoji: '⏸️' },
+    { id: 'complete', label: '수료', emoji: '📋' },
+    { id: 'graduate', label: '졸업', emoji: '🎓' },
+];
+
+const COLLEGES = [
+    { id: 'liberal_arts', label: '문과대학', emoji: '📖' },
+    { id: 'commerce', label: '상경대학', emoji: '📊' },
+    { id: 'business', label: '경영대학', emoji: '💼' },
+    { id: 'science', label: '이과대학', emoji: '🔬' },
+    { id: 'engineering', label: '공과대학', emoji: '⚙️' },
+    { id: 'life_science', label: '생명시스템대학', emoji: '🧬' },
+    { id: 'ai_convergence', label: '인공지능융합대학', emoji: '🤖' },
+    { id: 'theology', label: '신과대학', emoji: '✝️' },
+    { id: 'social_science', label: '사회과학대학', emoji: '🏛️' },
+    { id: 'music', label: '음악대학', emoji: '🎵' },
+    { id: 'human_ecology', label: '생활과학대학', emoji: '🏠' },
+    { id: 'education', label: '교육과학대학', emoji: '📚' },
+    { id: 'underwood', label: '언더우드국제대학', emoji: '🌍' },
+    { id: 'global_talent', label: '글로벌인재대학', emoji: '🌐' },
+    { id: 'medicine', label: '의과대학', emoji: '⚕️' },
+    { id: 'dentistry', label: '치과대학', emoji: '🦷' },
+    { id: 'nursing', label: '간호대학', emoji: '💉' },
+    { id: 'pharmacy', label: '약학대학', emoji: '💊' },
+];
+
 const CATEGORIES = [
     { id: 'job', label: '취업', emoji: '💼', description: '채용, 인턴십, 취업설명회' },
     { id: 'scholarship', label: '장학', emoji: '🎓', description: '장학금, 교환학생, 학비지원' },
@@ -10,12 +41,16 @@ const CATEGORIES = [
 
 const OnboardingModal = ({ isOpen, onComplete }) => {
     const [step, setStep] = useState(1);
+    const [selectedGrade, setSelectedGrade] = useState(null);
+    const [selectedCollege, setSelectedCollege] = useState(null);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             setStep(1);
+            setSelectedGrade(null);
+            setSelectedCollege(null);
             setSelectedCategories([]);
         }
     }, [isOpen]);
@@ -33,11 +68,15 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
         setTimeout(() => {
             if (step === 1) {
                 setStep(2);
-            } else if (step === 2 && selectedCategories.length > 0) {
+            } else if (step === 2 && selectedGrade) {
                 setStep(3);
-                // 3초 후 자동으로 완료
+            } else if (step === 3 && selectedCollege) {
+                setStep(4);
+            } else if (step === 4 && selectedCategories.length > 0) {
+                setStep(5);
+                // 2.5초 후 자동으로 완료
                 setTimeout(() => {
-                    onComplete(selectedCategories);
+                    onComplete(selectedCategories, { grade: selectedGrade, college: selectedCollege });
                 }, 2500);
             }
             setIsAnimating(false);
@@ -82,8 +121,131 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                     </div>
                 )}
 
-                {/* Step 2: Category Selection */}
+                {/* Step 2: Grade Selection */}
                 {step === 2 && (
+                    <div className="text-center">
+                        <div className="mb-8">
+                            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                                학년을 선택해 주세요
+                            </h2>
+                            <p className="text-gray-400">
+                                현재 학적 상태를 알려주세요
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-4 gap-3 mb-4">
+                            {GRADES.slice(0, 4).map((grade) => {
+                                const isSelected = selectedGrade === grade.id;
+                                return (
+                                    <button
+                                        key={grade.id}
+                                        onClick={() => setSelectedGrade(grade.id)}
+                                        className={`p-4 rounded-2xl border-2 transition-all duration-300 text-center ${isSelected
+                                            ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                                            : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                                            }`}
+                                    >
+                                        <span className="text-2xl mb-1 block">{grade.emoji}</span>
+                                        <h3 className={`font-semibold text-sm ${isSelected ? 'text-purple-300' : 'text-white'}`}>
+                                            {grade.label}
+                                        </h3>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3 mb-8">
+                            {GRADES.slice(4).map((grade) => {
+                                const isSelected = selectedGrade === grade.id;
+                                return (
+                                    <button
+                                        key={grade.id}
+                                        onClick={() => setSelectedGrade(grade.id)}
+                                        className={`p-4 rounded-2xl border-2 transition-all duration-300 text-center ${isSelected
+                                            ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                                            : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                                            }`}
+                                    >
+                                        <span className="text-2xl mb-1 block">{grade.emoji}</span>
+                                        <h3 className={`font-semibold text-sm ${isSelected ? 'text-purple-300' : 'text-white'}`}>
+                                            {grade.label}
+                                        </h3>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {selectedGrade && (
+                            <button
+                                onClick={handleNext}
+                                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-lg rounded-full shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all hover:scale-105"
+                            >
+                                다음
+                            </button>
+                        )}
+
+                        {!selectedGrade && (
+                            <p className="text-sm text-gray-500">
+                                학년을 선택해 주세요
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* Step 3: College Selection */}
+                {step === 3 && (
+                    <div className="text-center">
+                        <div className="mb-6">
+                            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                                소속 대학을 선택해 주세요
+                            </h2>
+                            <p className="text-gray-400">
+                                어느 단과대학에 소속되어 있나요?
+                            </p>
+                        </div>
+
+                        <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="grid grid-cols-3 gap-3 mb-6">
+                                {COLLEGES.map((college) => {
+                                    const isSelected = selectedCollege === college.id;
+                                    return (
+                                        <button
+                                            key={college.id}
+                                            onClick={() => setSelectedCollege(college.id)}
+                                            className={`p-3 rounded-xl border-2 transition-all duration-300 text-center ${isSelected
+                                                ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                                                : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                                                }`}
+                                        >
+                                            <span className="text-xl mb-1 block">{college.emoji}</span>
+                                            <h3 className={`font-medium text-xs ${isSelected ? 'text-purple-300' : 'text-white'}`}>
+                                                {college.label}
+                                            </h3>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {selectedCollege && (
+                            <button
+                                onClick={handleNext}
+                                className="mt-4 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-lg rounded-full shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all hover:scale-105"
+                            >
+                                다음
+                            </button>
+                        )}
+
+                        {!selectedCollege && (
+                            <p className="mt-4 text-sm text-gray-500">
+                                단과대학을 선택해 주세요
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* Step 4: Category Selection */}
+                {step === 4 && (
                     <div className="text-center">
                         <div className="mb-8">
                             <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
@@ -138,13 +300,13 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                     </div>
                 )}
 
-                {/* Step 3: Completion */}
-                {step === 3 && (
+                {/* Step 5: Completion */}
+                {step === 5 && (
                     <div className="text-center">
                         <div className="mb-8">
                             <span className="text-6xl mb-6 block">✨</span>
                             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                                선택 완료!
+                                설정 완료!
                             </h2>
                             <p className="text-xl text-gray-300 leading-relaxed">
                                 앞으로{' '}
@@ -155,18 +317,28 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap justify-center gap-2">
-                            {selectedCategories.map((catId) => {
-                                const cat = CATEGORIES.find((c) => c.id === catId);
-                                return (
-                                    <span
-                                        key={catId}
-                                        className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-300 text-sm"
-                                    >
-                                        {cat?.emoji} {cat?.label}
-                                    </span>
-                                );
-                            })}
+                        <div className="space-y-4 mb-6">
+                            <div className="flex justify-center gap-2">
+                                <span className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-300 text-sm">
+                                    {GRADES.find((g) => g.id === selectedGrade)?.emoji} {GRADES.find((g) => g.id === selectedGrade)?.label}
+                                </span>
+                                <span className="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full text-green-300 text-sm">
+                                    {COLLEGES.find((c) => c.id === selectedCollege)?.emoji} {COLLEGES.find((c) => c.id === selectedCollege)?.label}
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {selectedCategories.map((catId) => {
+                                    const cat = CATEGORIES.find((c) => c.id === catId);
+                                    return (
+                                        <span
+                                            key={catId}
+                                            className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-300 text-sm"
+                                        >
+                                            {cat?.emoji} {cat?.label}
+                                        </span>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div className="mt-8">
@@ -177,7 +349,7 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
 
                 {/* Step indicator */}
                 <div className="flex justify-center gap-2 mt-10">
-                    {[1, 2, 3].map((s) => (
+                    {[1, 2, 3, 4, 5].map((s) => (
                         <div
                             key={s}
                             className={`w-2 h-2 rounded-full transition-all duration-300 ${s === step

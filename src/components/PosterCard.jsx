@@ -1,6 +1,7 @@
 import React from 'react';
+import { incrementUserAction } from '../firebase';
 
-const PosterCard = ({ poster, onSave, isSaved }) => {
+const PosterCard = ({ poster, onSave, isSaved, onCardClick }) => {
     const { thumbnail, title, date, tags } = poster;
 
     const handleSaveClick = (e) => {
@@ -10,8 +11,17 @@ const PosterCard = ({ poster, onSave, isSaved }) => {
         }
     };
 
+    const handleCardClick = () => {
+        // Firebase에 포스터 상세 조회 추적
+        incrementUserAction('poster_detail_view');
+        // 부모 핸들러 호출 (있는 경우)
+        if (onCardClick) {
+            onCardClick(poster);
+        }
+    };
+
     return (
-        <article className="poster-card group">
+        <article className="poster-card group cursor-pointer" onClick={handleCardClick}>
             {/* Thumbnail */}
             <div className="relative aspect-[3/4] overflow-hidden">
                 <img
@@ -25,8 +35,8 @@ const PosterCard = ({ poster, onSave, isSaved }) => {
                 <button
                     onClick={handleSaveClick}
                     className={`absolute top-3 right-3 p-2 rounded-lg backdrop-blur-lg border transition-all ${isSaved
-                            ? 'bg-purple-500/80 border-purple-400 text-white'
-                            : 'bg-black/40 border-white/20 text-white/80 hover:bg-purple-500/60 hover:border-purple-400'
+                        ? 'bg-purple-500/80 border-purple-400 text-white'
+                        : 'bg-black/40 border-white/20 text-white/80 hover:bg-purple-500/60 hover:border-purple-400'
                         }`}
                     title={isSaved ? '보관됨' : '보관함에 저장'}
                 >
@@ -60,3 +70,4 @@ const PosterCard = ({ poster, onSave, isSaved }) => {
 };
 
 export default PosterCard;
+
