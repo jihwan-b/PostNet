@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import StarRating from './StarRating';
 
 const FEEDBACK_CHOICES = [
     { id: 'design', label: '디자인' },
@@ -41,7 +42,6 @@ const VALIDATION_QUESTIONS = [
 
 const FeedbackModal = ({ isOpen, onClose, onSubmit }) => {
     const [rating, setRating] = useState(0);
-    const [hoveredRating, setHoveredRating] = useState(0);
     const [goodPoints, setGoodPoints] = useState([]);
     const [badPoints, setBadPoints] = useState([]);
     const [validationAnswers, setValidationAnswers] = useState({});
@@ -121,22 +121,12 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit }) => {
                     <p className="text-gray-400 text-sm">서비스 경험을 공유해 주세요!</p>
 
                     {/* Star Rating */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-3">전체 만족도</label>
-                        <div className="flex gap-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    onClick={() => setRating(star)}
-                                    onMouseEnter={() => setHoveredRating(star)}
-                                    onMouseLeave={() => setHoveredRating(0)}
-                                    className="text-3xl transition-colors cursor-pointer hover:brightness-110"
-                                >
-                                    {star <= (hoveredRating || rating) ? '⭐' : '☆'}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+                    <StarRating
+                        rating={rating}
+                        onChange={setRating}
+                        size={36}
+                        label="전체 만족도"
+                    />
 
                     {/* Validation Questions */}
                     <div className="space-y-4 p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
