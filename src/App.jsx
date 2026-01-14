@@ -514,6 +514,11 @@ function App() {
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleFeedbackSubmit}
             />
+
+            {/* Footer */}
+            <footer className="py-6 text-center text-gray-500 text-sm">
+                Made with <span className="text-red-500">❤️</span> by Jihwan
+            </footer>
         </div>
     );
 }
