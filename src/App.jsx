@@ -10,7 +10,7 @@ import LocationSelector, { LOCATIONS } from './components/LocationSelector';
 import NotificationPopup from './components/NotificationPopup';
 import ArchiveModal from './components/ArchiveModal';
 import StreakBadge from './components/StreakBadge';
-import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount, incrementUserAction, getAndUpdateStreak, logHelpfulFeedback } from './firebase';
+import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount, incrementUserAction, getAndUpdateStreak, logHelpfulFeedback, trackUTMSource } from './firebase';
 
 // 위치별 샘플 공고 데이터 (연세대 신촌캠퍼스)
 const LOCATION_NOTIFICATIONS = {
@@ -363,6 +363,138 @@ const SAMPLE_POSTERS = [
         tags: ['교육', 'AWS', '자격증'],
         category: 'education',
     },
+    // 추가 채용 (알림에서 사용)
+    {
+        id: 15,
+        title: 'LG전자 2026 채용설명회',
+        date: '2026.01.20 - 2026.02.15',
+        thumbnail: 'https://picsum.photos/seed/lg/400/533',
+        tags: ['채용', 'LG', '전자'],
+        category: 'job',
+    },
+    {
+        id: 16,
+        title: '네이버 2026 신입 공채',
+        date: '2026.01.15 - 2026.02.28',
+        thumbnail: 'https://picsum.photos/seed/naver/400/533',
+        tags: ['채용', '네이버', 'IT'],
+        category: 'job',
+    },
+    {
+        id: 17,
+        title: '카카오 2026 상반기 채용',
+        date: '2026.01.20 - 2026.02.20',
+        thumbnail: 'https://picsum.photos/seed/kakao/400/533',
+        tags: ['채용', '카카오', 'IT'],
+        category: 'job',
+    },
+    {
+        id: 18,
+        title: '맥킨지 2026 신입/경력 채용',
+        date: '2026.01.25 - 2026.02.28',
+        thumbnail: 'https://picsum.photos/seed/mckinsey/400/533',
+        tags: ['채용', '컨설팅', '맥킨지'],
+        category: 'job',
+    },
+    // 추가 동아리 (알림에서 사용)
+    {
+        id: 19,
+        title: '중앙수영동아리 물사랑 신입부원 모집',
+        date: '2026.01.10 - 2026.02.05',
+        thumbnail: 'https://picsum.photos/seed/swimming/400/533',
+        tags: ['동아리', '수영', '물사랑'],
+        category: 'club',
+    },
+    {
+        id: 20,
+        title: '복싱동아리 Yonsei Boxer 신입부원 모집',
+        date: '2026.01.15 - 2026.02.10',
+        thumbnail: 'https://picsum.photos/seed/boxing/400/533',
+        tags: ['동아리', '복싱'],
+        category: 'club',
+    },
+    {
+        id: 21,
+        title: '혼성합창동아리 아브낭뜨 신입부원 모집',
+        date: '2026.01.20 - 2026.02.15',
+        thumbnail: 'https://picsum.photos/seed/abnante/400/533',
+        tags: ['동아리', '합창', '아브낭뜨'],
+        category: 'club',
+    },
+    {
+        id: 22,
+        title: 'YONSEI BIZ 케이스 스터디 모집',
+        date: '2026.01.15 - 2026.02.10',
+        thumbnail: 'https://picsum.photos/seed/bizcase/400/533',
+        tags: ['동아리', '케이스스터디', '경영'],
+        category: 'club',
+    },
+    // 추가 교육 (알림에서 사용)
+    {
+        id: 23,
+        title: '전기전자공학부 랩투어',
+        date: '2026.02.05 - 2026.02.20',
+        thumbnail: 'https://picsum.photos/seed/labtour/400/533',
+        tags: ['교육', '랩투어', '대학원'],
+        category: 'education',
+    },
+    {
+        id: 24,
+        title: 'TOEFL/GRE 무료 특강',
+        date: '2026.01.20 - 2026.02.10',
+        thumbnail: 'https://picsum.photos/seed/toefl/400/533',
+        tags: ['교육', 'TOEFL', '특강'],
+        category: 'education',
+    },
+    {
+        id: 25,
+        title: '이학대학 대학원 입학설명회',
+        date: '2026.02.01 - 2026.02.15',
+        thumbnail: 'https://picsum.photos/seed/scigrad/400/533',
+        tags: ['대학원', '이학', '진학'],
+        category: 'education',
+    },
+    {
+        id: 26,
+        title: '인문학 콘서트: 철학과 AI',
+        date: '2026.02.10 - 2026.02.20',
+        thumbnail: 'https://picsum.photos/seed/humanities/400/533',
+        tags: ['교육', '인문학', '특강'],
+        category: 'education',
+    },
+    // 추가 행사 (알림에서 사용)
+    {
+        id: 27,
+        title: '아카라카 2026 자원봉사자 모집',
+        date: '2026.03.01 - 2026.03.20',
+        thumbnail: 'https://picsum.photos/seed/akaraka/400/533',
+        tags: ['축제', '아카라카', '봉사'],
+        category: 'event',
+    },
+    {
+        id: 28,
+        title: '연세대 입학식 2026',
+        date: '2026.03.02 - 2026.03.02',
+        thumbnail: 'https://picsum.photos/seed/ceremony/400/533',
+        tags: ['행사', '입학식', '신입생'],
+        category: 'event',
+    },
+    {
+        id: 29,
+        title: '연세 오케스트라 정기연주회',
+        date: '2026.02.15 - 2026.02.15',
+        thumbnail: 'https://picsum.photos/seed/orchestra/400/533',
+        tags: ['행사', '음악', '오케스트라'],
+        category: 'event',
+    },
+    {
+        id: 30,
+        title: '무악학사 기숙사 입사 안내',
+        date: '2026.02.01 - 2026.02.28',
+        thumbnail: 'https://picsum.photos/seed/dorm/400/533',
+        tags: ['기숙사', '입사', '주거'],
+        category: 'event',
+    },
 ];
 
 function App() {
@@ -387,7 +519,7 @@ function App() {
     const [currentStreak, setCurrentStreak] = useState(0);
     const [showStreakBadge, setShowStreakBadge] = useState(false);
 
-    // 온보딩 체크
+    // 온보딩 체크 및 UTM 트래킹
     useEffect(() => {
         const hasCompletedOnboarding = localStorage.getItem('postnet_onboarding_complete');
         if (!hasCompletedOnboarding) {
@@ -402,6 +534,9 @@ function App() {
 
         // 세션 시작 이벤트
         logEvent('session_start', { timestamp: new Date().toISOString() });
+
+        // UTM 소스 트래킹
+        trackUTMSource();
     }, []);
 
     const handleOnboardingComplete = async (categories, userInfo = {}) => {
@@ -478,7 +613,7 @@ function App() {
 
     const handleViewDetail = async (notification) => {
         await incrementReactionCount();
-        // 해당 카테고리로 필터 설정 (alert 없이)
+        // 해당 카테고리로 필터 설정
         setSelectedCategories([notification.category]);
         setCurrentNotification(null);
 
@@ -486,6 +621,24 @@ function App() {
             notification_id: notification.id,
             category: notification.category,
         });
+
+        // 해당 카테고리의 첫 번째 포스터 찾기 (알림과 포스터 ID가 다르므로)
+        const matchingPoster = SAMPLE_POSTERS.find(p => p.category === notification.category);
+
+        // DOM 업데이트 후 해당 포스터로 스크롤
+        setTimeout(() => {
+            if (matchingPoster) {
+                const targetElement = document.getElementById(`poster-${matchingPoster.id}`);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // 하이라이트 효과 추가
+                    targetElement.classList.add('ring-2', 'ring-purple-500', 'ring-offset-2', 'ring-offset-slate-900');
+                    setTimeout(() => {
+                        targetElement.classList.remove('ring-2', 'ring-purple-500', 'ring-offset-2', 'ring-offset-slate-900');
+                    }, 2000);
+                }
+            }
+        }, 100);
     };
 
     const handleSaveNotification = async (notification) => {
@@ -536,10 +689,23 @@ function App() {
         setSavedPosters((prev) => prev.filter((p) => p.id !== itemId));
     };
 
-    // 보관함 바로가기 (카테고리로 이동)
+    // 보관함 바로가기 (카테고리로 이동 + 스크롤)
     const handleMoveFromArchive = (item) => {
         setSelectedCategories([item.category]);
         setIsArchiveOpen(false);
+
+        // DOM 업데이트 후 해당 포스터로 스크롤
+        setTimeout(() => {
+            const targetElement = document.getElementById(`poster-${item.id}`);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 하이라이트 효과 추가
+                targetElement.classList.add('ring-2', 'ring-purple-500', 'ring-offset-2', 'ring-offset-slate-900');
+                setTimeout(() => {
+                    targetElement.classList.remove('ring-2', 'ring-purple-500', 'ring-offset-2', 'ring-offset-slate-900');
+                }, 2000);
+            }
+        }, 100);
     };
 
     const handleFeedbackSubmit = async (feedbackData) => {
@@ -582,6 +748,29 @@ function App() {
             <Header
                 onArchiveClick={() => setIsArchiveOpen(true)}
                 savedCount={allSavedItems.length}
+                onSettingsReset={() => {
+                    // confirm 결과를 변수에 저장하여 한 번만 실행되도록 함
+                    const shouldReset = window.confirm('설정을 초기화하고 온보딩을 다시 시작하시겠습니까?');
+                    if (!shouldReset) return;
+
+                    // localStorage 초기화
+                    localStorage.removeItem('postnet_onboarding_complete');
+                    localStorage.removeItem('postnet_user_categories');
+                    localStorage.removeItem('postnet_user_grade');
+                    localStorage.removeItem('postnet_user_college');
+
+                    // 상태 초기화
+                    setUserCategories([]);
+                    setSelectedCategories([]);
+                    setSavedNotifications([]);
+                    setSavedPosters([]);
+
+                    // Firebase 로깅 (비동기지만 await 불필요)
+                    logEvent('settings_reset', { timestamp: new Date().toISOString() });
+
+                    // 온보딩 다시 표시
+                    setShowOnboarding(true);
+                }}
             />
 
             {/* Location Selector */}
@@ -651,7 +840,7 @@ function App() {
 
             {/* Footer */}
             <footer className="py-6 text-center text-gray-500 text-sm">
-                Made with <span className="text-red-500">❤️</span> by Jihwan
+                Made with <span className="text-red-500">❤️</span> by Jihwan & Sora
             </footer>
         </div>
     );

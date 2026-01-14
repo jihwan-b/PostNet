@@ -21,9 +21,9 @@ const PosterCard = ({ poster, onSave, isSaved, onCardClick }) => {
     };
 
     return (
-        <article className="poster-card group cursor-pointer" onClick={handleCardClick}>
+        <article id={`poster-${poster.id}`} className="poster-card group cursor-pointer" onClick={handleCardClick}>
             {/* Thumbnail */}
-            <div className="relative aspect-[3/4] overflow-hidden">
+            <div className="relative aspect-[4/5] overflow-hidden">
                 <img
                     src={thumbnail}
                     alt={title}

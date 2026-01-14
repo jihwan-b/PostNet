@@ -83,6 +83,16 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
         }, 300);
     };
 
+    const handleBack = () => {
+        setIsAnimating(true);
+        setTimeout(() => {
+            if (step > 1) {
+                setStep(step - 1);
+            }
+            setIsAnimating(false);
+        }, 300);
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -189,6 +199,16 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                                 학년을 선택해 주세요
                             </p>
                         )}
+
+                        {/* Back Button */}
+                        <div className="mt-6 block">
+                            <button
+                                onClick={handleBack}
+                                className="text-sm text-gray-400 hover:text-white transition-colors"
+                            >
+                                ← 이전 단계
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -241,6 +261,16 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                                 단과대학을 선택해 주세요
                             </p>
                         )}
+
+                        {/* Back Button */}
+                        <div className="mt-6 block">
+                            <button
+                                onClick={handleBack}
+                                className="text-sm text-gray-400 hover:text-white transition-colors"
+                            >
+                                ← 이전 단계
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -297,6 +327,16 @@ const OnboardingModal = ({ isOpen, onComplete }) => {
                                 최소 1개 이상 선택해 주세요
                             </p>
                         )}
+
+                        {/* Back Button */}
+                        <div className="mt-6 block">
+                            <button
+                                onClick={handleBack}
+                                className="text-sm text-gray-400 hover:text-white transition-colors"
+                            >
+                                ← 이전 단계
+                            </button>
+                        </div>
                     </div>
                 )}
 

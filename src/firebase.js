@@ -281,5 +281,61 @@ export const logHelpfulFeedback = async (notificationId, isHelpful) => {
     }
 };
 
+// UTM 소스 트래킹 함수
+export const trackUTMSource = async () => {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utmSource = urlParams.get('utm_source');
+        const utmMedium = urlParams.get('utm_medium');
+        const utmCampaign = urlParams.get('utm_campaign');
+
+        // UTM 파라미터가 없으면 건너뛰기
+        if (!utmSource && !utmMedium && !utmCampaign) {
+            return { success: true, tracked: false };
+        }
+
+        const userId = getUserId();
+        const sessionId = getSessionId();
+
+        // UTM 데이터 저장
+        const utmRef = collection(db, 'utm_tracking');
+        await addDoc(utmRef, {
+            userId,
+            sessionId,
+            utm_source: utmSource || null,
+            utm_medium: utmMedium || null,
+            utm_campaign: utmCampaign || null,
+            referrer: document.referrer || null,
+            createdAt: serverTimestamp()
+        });
+
+        // 통계 업데이트
+        if (utmSource) {
+            const statsRef = doc(db, 'stats', 'utm_sources');
+            const statsDoc = await getDoc(statsRef);
+            const fieldName = `source_${utmSource}`;
+
+            if (statsDoc.exists()) {
+                await updateDoc(statsRef, {
+                    [fieldName]: increment(1),
+                    lastUpdated: serverTimestamp()
+                });
+            } else {
+                await setDoc(statsRef, {
+                    [fieldName]: 1,
+                    createdAt: serverTimestamp(),
+                    lastUpdated: serverTimestamp()
+                });
+            }
+        }
+
+        console.log(`[UTM] Tracked: source=${utmSource}, medium=${utmMedium}, campaign=${utmCampaign}`);
+        return { success: true, tracked: true, utmSource, utmMedium, utmCampaign };
+    } catch (error) {
+        console.error('UTM 트래킹 오류:', error);
+        return { success: false, error };
+    }
+};
+
 export { db };
 

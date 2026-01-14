@@ -130,7 +130,7 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit }) => {
                                     onClick={() => setRating(star)}
                                     onMouseEnter={() => setHoveredRating(star)}
                                     onMouseLeave={() => setHoveredRating(0)}
-                                    className="text-3xl transition-transform hover:scale-110"
+                                    className="text-3xl transition-colors cursor-pointer hover:brightness-110"
                                 >
                                     {star <= (hoveredRating || rating) ? '⭐' : '☆'}
                                 </button>
@@ -150,8 +150,8 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit }) => {
                                             key={opt.value}
                                             onClick={() => handleValidationAnswer(q.id, opt.value)}
                                             className={`flex-1 py-2 px-3 text-xs rounded-lg border transition-all ${validationAnswers[q.id] === opt.value
-                                                    ? 'border-purple-500 bg-purple-500/20 text-purple-300'
-                                                    : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
+                                                ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                                                : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
                                                 }`}
                                         >
                                             {opt.label}
@@ -172,8 +172,8 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit }) => {
                                         key={choice.id}
                                         onClick={() => handleChoiceToggle(choice.id, 'good')}
                                         className={`px-2 py-1 text-xs rounded-lg border transition-all ${goodPoints.includes(choice.id)
-                                                ? 'border-green-500 bg-green-500/20 text-green-300'
-                                                : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
+                                            ? 'border-green-500 bg-green-500/20 text-green-300'
+                                            : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
                                             }`}
                                     >
                                         {choice.label}
@@ -189,8 +189,8 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit }) => {
                                         key={choice.id}
                                         onClick={() => handleChoiceToggle(choice.id, 'bad')}
                                         className={`px-2 py-1 text-xs rounded-lg border transition-all ${badPoints.includes(choice.id)
-                                                ? 'border-red-500 bg-red-500/20 text-red-300'
-                                                : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
+                                            ? 'border-red-500 bg-red-500/20 text-red-300'
+                                            : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/30'
                                             }`}
                                     >
                                         {choice.label}
