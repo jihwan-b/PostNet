@@ -9,7 +9,8 @@ import OnboardingModal from './components/OnboardingModal';
 import LocationSelector, { LOCATIONS } from './components/LocationSelector';
 import NotificationPopup from './components/NotificationPopup';
 import ArchiveModal from './components/ArchiveModal';
-import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount, incrementUserAction } from './firebase';
+import StreakBadge from './components/StreakBadge';
+import { submitFeedback, logEvent, saveUserCategories, incrementReactionCount, incrementUserAction, getAndUpdateStreak, logHelpfulFeedback } from './firebase';
 
 // 위치별 샘플 공고 데이터 (연세대 신촌캠퍼스)
 const LOCATION_NOTIFICATIONS = {
@@ -33,22 +34,42 @@ const LOCATION_NOTIFICATIONS = {
             tags: ['학회', 'AI', 'YAI'],
         },
     ],
-    samsung: [
+    engineeringHall: [
+        {
+            id: 'n20',
+            title: 'LG전자 2026 채용설명회',
+            description: '공학관 대강당에서 진행됩니다. H&A, VS 사업부 채용!',
+            thumbnail: 'https://picsum.photos/seed/lg/400/225',
+            location: '공학관',
+            category: 'job',
+            tags: ['채용', 'LG', '전자'],
+        },
+        {
+            id: 'n21',
+            title: '전기전자공학부 랩투어',
+            description: '공학관 각 연구실 투어 진행. 대학원 진학 관심자 필참!',
+            thumbnail: 'https://picsum.photos/seed/labtour/400/225',
+            location: '공학관',
+            category: 'education',
+            tags: ['교육', '랩투어', '대학원'],
+        },
+    ],
+    centralLibrary: [
         {
             id: 'n3',
             title: '관정이종환재단 장학생 모집',
             description: '2026년도 관정재단 국내외 장학생을 모집합니다.',
             thumbnail: 'https://picsum.photos/seed/kwanjeong/400/225',
-            location: '삼성학술정보관',
+            location: '중앙도서관',
             category: 'scholarship',
             tags: ['장학금', '관정재단', '국내장학'],
         },
         {
             id: 'n4',
             title: 'TOEFL/GRE 무료 특강',
-            description: '삼성학술정보관 세미나실에서 무료 특강이 진행됩니다.',
+            description: '중앙도서관 세미나실에서 무료 특강이 진행됩니다.',
             thumbnail: 'https://picsum.photos/seed/toefl/400/225',
-            location: '삼성학술정보관',
+            location: '중앙도서관',
             category: 'education',
             tags: ['교육', 'TOEFL', '특강'],
         },
@@ -104,6 +125,17 @@ const LOCATION_NOTIFICATIONS = {
             tags: ['채용', 'SK하이닉스', '인턴'],
         },
     ],
+    scienceInstitute: [
+        {
+            id: 'n22',
+            title: '이학대학 대학원 입학설명회',
+            description: '과학원에서 이학분야 대학원 진학 설명회가 열립니다.',
+            thumbnail: 'https://picsum.photos/seed/scigrad/400/225',
+            location: '과학원',
+            category: 'education',
+            tags: ['대학원', '이학', '진학'],
+        },
+    ],
     yongjae: [
         {
             id: 'n10',
@@ -122,6 +154,92 @@ const LOCATION_NOTIFICATIONS = {
             location: '용재홀',
             category: 'scholarship',
             tags: ['장학금', '삼송재단'],
+        },
+    ],
+    business: [
+        {
+            id: 'n12',
+            title: '맥킨지 2026 신입/경력 채용',
+            description: '경영관에서 컨설팅펌 채용설명회가 열립니다.',
+            thumbnail: 'https://picsum.photos/seed/mckinsey/400/225',
+            location: '경영관',
+            category: 'job',
+            tags: ['채용', '컨설팅', '맥킨지'],
+        },
+        {
+            id: 'n13',
+            title: 'YONSEI BIZ 케이스 스터디 모집',
+            description: '경영대 케이스 스터디 동아리 신입 모집!',
+            thumbnail: 'https://picsum.photos/seed/bizcase/400/225',
+            location: '경영관',
+            category: 'club',
+            tags: ['동아리', '케이스스터디', '경영'],
+        },
+    ],
+    daewoo: [
+        {
+            id: 'n14',
+            title: '네이버 2026 신입 공채',
+            description: '대우관에서 네이버 채용설명회가 진행됩니다.',
+            thumbnail: 'https://picsum.photos/seed/naver/400/225',
+            location: '대우관',
+            category: 'job',
+            tags: ['채용', '네이버', 'IT'],
+        },
+    ],
+    samsungHall: [
+        {
+            id: 'n15',
+            title: '카카오 2026 상반기 채용',
+            description: '삼성관에서 카카오 채용설명회가 열립니다.',
+            thumbnail: 'https://picsum.photos/seed/kakao/400/225',
+            location: '삼성관',
+            category: 'job',
+            tags: ['채용', '카카오', 'IT'],
+        },
+    ],
+    widang: [
+        {
+            id: 'n16',
+            title: '인문학 콘서트: 철학과 AI',
+            description: '위당관에서 인문학 특강이 진행됩니다.',
+            thumbnail: 'https://picsum.photos/seed/humanities/400/225',
+            location: '위당관',
+            category: 'education',
+            tags: ['교육', '인문학', '특강'],
+        },
+    ],
+    auditorium: [
+        {
+            id: 'n17',
+            title: '연세대 입학식 2026',
+            description: '대강당에서 신입생 입학식이 거행됩니다.',
+            thumbnail: 'https://picsum.photos/seed/ceremony/400/225',
+            location: '대강당',
+            category: 'event',
+            tags: ['행사', '입학식', '신입생'],
+        },
+    ],
+    music: [
+        {
+            id: 'n18',
+            title: '연세 오케스트라 정기연주회',
+            description: '음악관에서 정기 연주회가 열립니다.',
+            thumbnail: 'https://picsum.photos/seed/orchestra/400/225',
+            location: '음악관',
+            category: 'event',
+            tags: ['행사', '음악', '오케스트라'],
+        },
+    ],
+    muak: [
+        {
+            id: 'n19',
+            title: '무악학사 기숙사 입사 안내',
+            description: '2026년도 1학기 기숙사 입사 신청 안내입니다.',
+            thumbnail: 'https://picsum.photos/seed/dorm/400/225',
+            location: '무악학사',
+            category: 'event',
+            tags: ['기숙사', '입사', '주거'],
         },
     ],
 };
@@ -264,6 +382,10 @@ function App() {
     // 필터 및 모달 상태
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // 스트릭 상태
+    const [currentStreak, setCurrentStreak] = useState(0);
+    const [showStreakBadge, setShowStreakBadge] = useState(false);
 
     // 온보딩 체크
     useEffect(() => {
@@ -486,6 +608,9 @@ function App() {
 
             <VisitorCounter />
 
+            {/* Streak Badge */}
+            <StreakBadge streak={currentStreak} visible={showStreakBadge} />
+
             {/* Notification Popup */}
             <NotificationPopup
                 notification={currentNotification}
@@ -493,6 +618,15 @@ function App() {
                 onSave={handleSaveNotification}
                 onDismiss={handleDismissNotification}
                 onLogEvent={handleLogEvent}
+                onFeedback={async (notificationId, isHelpful) => {
+                    await logHelpfulFeedback(notificationId, isHelpful);
+                    const result = await getAndUpdateStreak();
+                    if (result.success && result.streak >= 2) {
+                        setCurrentStreak(result.streak);
+                        setShowStreakBadge(true);
+                        setTimeout(() => setShowStreakBadge(false), 3000);
+                    }
+                }}
             />
 
             {/* Archive Modal */}

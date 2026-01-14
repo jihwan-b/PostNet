@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
-const NotificationPopup = ({ notification, onViewDetail, onSave, onDismiss, onLogEvent }) => {
+const NotificationPopup = ({ notification, onViewDetail, onSave, onDismiss, onLogEvent, onFeedback }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
+    const [showFeedback, setShowFeedback] = useState(false);
+    const [feedbackGiven, setFeedbackGiven] = useState(null);
 
     useEffect(() => {
         if (notification) {
             setIsVisible(true);
             setIsExiting(false);
+            setShowFeedback(false);
+            setFeedbackGiven(null);
         }
     }, [notification]);
 
@@ -33,6 +37,20 @@ const NotificationPopup = ({ notification, onViewDetail, onSave, onDismiss, onLo
                 onDismiss?.();
             }
         }, 300);
+    };
+
+    const handleFeedback = async (isHelpful) => {
+        setFeedbackGiven(isHelpful);
+
+        // Firebase에 피드백 기록
+        if (onFeedback) {
+            await onFeedback(notification?.id, isHelpful);
+        }
+
+        // 잠시 후 팝업 닫기
+        setTimeout(() => {
+            handleAction(isHelpful ? 'feedback_helpful' : 'feedback_not_helpful');
+        }, 800);
     };
 
     if (!notification || !isVisible) return null;
@@ -102,7 +120,7 @@ const NotificationPopup = ({ notification, onViewDetail, onSave, onDismiss, onLo
                 </div>
 
                 {/* Actions */}
-                <div className="px-5 pb-5 flex gap-3">
+                <div className="px-5 pb-4 flex gap-3">
                     <button
                         onClick={() => handleAction('save_to_archive')}
                         className="flex-1 py-3 bg-white/5 border border-white/10 text-white font-medium rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
@@ -122,9 +140,45 @@ const NotificationPopup = ({ notification, onViewDetail, onSave, onDismiss, onLo
                         </svg>
                     </button>
                 </div>
+
+                {/* Helpful Feedback Section */}
+                <div className="px-5 pb-5 border-t border-white/10 pt-4">
+                    <p className="text-sm text-gray-400 text-center mb-3">
+                        이 정보가 유용했나요?
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                        <button
+                            onClick={() => handleFeedback(true)}
+                            disabled={feedbackGiven !== null}
+                            className={`px-6 py-2 rounded-xl text-lg transition-all flex items-center gap-2 ${feedbackGiven === true
+                                    ? 'bg-green-500/30 text-green-300 scale-110'
+                                    : feedbackGiven !== null
+                                        ? 'bg-white/5 text-gray-500 opacity-50'
+                                        : 'bg-white/10 text-white hover:bg-green-500/20 hover:text-green-300'
+                                }`}
+                        >
+                            <span className="text-xl">👍</span>
+                            {feedbackGiven === true && <span className="text-sm font-medium">감사합니다!</span>}
+                        </button>
+                        <button
+                            onClick={() => handleFeedback(false)}
+                            disabled={feedbackGiven !== null}
+                            className={`px-6 py-2 rounded-xl text-lg transition-all flex items-center gap-2 ${feedbackGiven === false
+                                    ? 'bg-red-500/30 text-red-300 scale-110'
+                                    : feedbackGiven !== null
+                                        ? 'bg-white/5 text-gray-500 opacity-50'
+                                        : 'bg-white/10 text-white hover:bg-red-500/20 hover:text-red-300'
+                                }`}
+                        >
+                            <span className="text-xl">👎</span>
+                            {feedbackGiven === false && <span className="text-sm font-medium">개선할게요</span>}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
 export default NotificationPopup;
+

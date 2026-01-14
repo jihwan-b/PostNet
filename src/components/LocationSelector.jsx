@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 
 const LOCATIONS = [
-    { id: 'engineering', name: '공학원(제1공학관)', icon: '🏗️' },
-    { id: 'samsung', name: '삼성학술정보관', icon: '📚' },
+    { id: 'engineering', name: '공학원', icon: '🏗️' },
+    { id: 'engineeringHall', name: '공학관', icon: '🏛️' },
+    { id: 'centralLibrary', name: '중앙도서관', icon: '📚' },
     { id: 'baekyang', name: '백양누리', icon: '🏢' },
     { id: 'student', name: '학생회관', icon: '🎭' },
     { id: 'science', name: '과학관', icon: '🔬' },
+    { id: 'scienceInstitute', name: '과학원', icon: '⚗️' },
     { id: 'yongjae', name: '용재홀', icon: '🎓' },
+    { id: 'business', name: '경영관', icon: '💼' },
+    { id: 'daewoo', name: '대우관', icon: '🏫' },
+    { id: 'samsungHall', name: '삼성관', icon: '🏬' },
+    { id: 'widang', name: '위당관', icon: '📖' },
+    { id: 'auditorium', name: '대강당', icon: '🎤' },
+    { id: 'music', name: '음악관', icon: '🎵' },
+    { id: 'muak', name: '무악학사', icon: '🏠' },
 ];
 
 const LocationSelector = ({ selectedLocations = [], onLocationToggle, onLogEvent }) => {

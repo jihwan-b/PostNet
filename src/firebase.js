@@ -201,5 +201,85 @@ export const incrementUserAction = async (actionType, actionName = null) => {
     }
 };
 
+// 연속 반응 (스트릭) 추적 함수
+export const getAndUpdateStreak = async () => {
+    try {
+        const userId = getUserId();
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+
+        const now = new Date();
+        let currentStreak = 1;
+
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            const lastReaction = data.lastReactionAt?.toDate();
+
+            // 마지막 반응이 30분 이내이면 스트릭 증가
+            if (lastReaction && (now - lastReaction) < 30 * 60 * 1000) {
+                currentStreak = (data.currentStreak || 0) + 1;
+            }
+
+            await updateDoc(userRef, {
+                currentStreak,
+                lastReactionAt: serverTimestamp(),
+                maxStreak: Math.max(data.maxStreak || 0, currentStreak)
+            });
+        } else {
+            await setDoc(userRef, {
+                currentStreak: 1,
+                lastReactionAt: serverTimestamp(),
+                maxStreak: 1
+            });
+        }
+
+        console.log(`[Streak] Current streak: ${currentStreak}`);
+        return { success: true, streak: currentStreak };
+    } catch (error) {
+        console.error('스트릭 업데이트 오류:', error);
+        return { success: false, streak: 0, error };
+    }
+};
+
+// 👍/👎 피드백 로깅 함수
+export const logHelpfulFeedback = async (notificationId, isHelpful) => {
+    try {
+        const userId = getUserId();
+        const feedbackRef = collection(db, 'helpfulness_feedback');
+
+        await addDoc(feedbackRef, {
+            userId,
+            notificationId,
+            isHelpful,
+            createdAt: serverTimestamp()
+        });
+
+        // 통계 업데이트
+        const statsRef = doc(db, 'stats', 'helpfulness');
+        const statsDoc = await getDoc(statsRef);
+        const fieldName = isHelpful ? 'helpful_count' : 'not_helpful_count';
+
+        if (statsDoc.exists()) {
+            await updateDoc(statsRef, {
+                [fieldName]: increment(1),
+                lastUpdated: serverTimestamp()
+            });
+        } else {
+            await setDoc(statsRef, {
+                helpful_count: isHelpful ? 1 : 0,
+                not_helpful_count: isHelpful ? 0 : 1,
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp()
+            });
+        }
+
+        console.log(`[Feedback] ${isHelpful ? '👍 Helpful' : '👎 Not helpful'} logged`);
+        return { success: true };
+    } catch (error) {
+        console.error('피드백 로깅 오류:', error);
+        return { success: false, error };
+    }
+};
+
 export { db };
 
